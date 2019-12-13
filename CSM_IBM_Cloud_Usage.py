@@ -12,7 +12,7 @@
 # D. Toczala (dtoczala@us.ibm.com)
 #
 
-# In[1]:
+# In[ ]:
 
 
 #Import utilities
@@ -31,7 +31,7 @@ from botocore.client import Config
 import ibm_boto3
 
 
-# In[2]:
+# In[ ]:
 
 
 #
@@ -58,7 +58,7 @@ class CloudService:
 
 
 
-# In[3]:
+# In[ ]:
 
 
 DEBUG = True
@@ -68,27 +68,36 @@ UNDERSCORE = '_'
 #
 # Set Initial IBM Cloud and COS parameters
 #
-credentials = {
+# YOU WILL NEED TO UNCOMMENT THIS CREDENTIALS LIST AND PROVIDE VALID SERVICE CREDENTIALS
+# FOR THIS SCRIPT TO RUN PROPERLY
+#
+#credentials = {
+#    'IBM_CLOUD_ACCOUNT_ID': 'x50xx4xx0dxxxxxxf8xxxxx1xx1xxxx5',
+#    'IBM_CLOUD_ACCOUNT_API_KEY': 'xxxxL1ixxxxxFX9fxxxxxxxdgFsxxxxxIDxxxxxxx08S',
+#    # Account COS creds
+#    'IAM_COS_SERVICE_ID': 'crn:v1:bluemix:public:iam-identity::a/dxxxxxxxxdc000000000exxxxa0002xx::serviceid:ServiceId-exa00000-7xx0-00xx-bxx6-60006xxxxxx5',
+#    'IBM_COS_API_KEY_ID': 'Wxxxxxxi00007-x04-0YAxxxxqFwxxxxxxexZ0000004',
+#    'RESULTS_BUCKET': 'billing-data'
+#}
+
+#
+# Service endpoints
+#
+# You may need to change these if you use a different data center
+#
+endpoints = {
     'IBM_CLOUD_BILLING_ENDPOINT': 'https://billing.cloud.ibm.com',
     'IBM_CLOUD_IAM_ENDPOINT': 'https://iam.cloud.ibm.com',
     'IBM_CLOUD_TAG_ENDPOINT': 'https://tags.global-search-tagging.cloud.ibm.com',
     'IBM_CLOUD_RESCONT_ENDPOINT': 'https://resource-controller.cloud.ibm.com/v2',
     'IBM_CLOUD_RESMGR_ENDPOINT': 'https://resource-manager.bluemix.net/v2/',
-    'IBM_AUTH_ENDPOINT': 'https://iam.bluemix.net/oidc/token',
     'IBM_CLOUD_REPORTING_PREFIX': '/v4/accounts/',
-# Clerico creds
-    'IBM_CLOUD_ACCOUNT_ID': 'xxxxxd50fxxb8xxx79fxxxxxxa1xx5',
-    'IBM_CLOUD_ACCOUNT_API_KEY': 'XbUXXXXXw5krFxxxxA9dgFXXXXsnxYxxxDxkWxxXX0xS',
-
+    'IBM_AUTH_ENDPOINT': 'https://iam.bluemix.net/oidc/token',
 #
 # Cloud Object Storage Settings
 #
     'COS_ENDPOINT': 'https://s3.us-south.cloud-object-storage.appdomain.cloud',
 
-# Clerico COS creds
-    'IAM_COS_SERVICE_ID': 'crn:v1:bluemix:public:iam-identity::a/d50xxxxx0dcxxxx7f8xxxxx18axxxxx5::serviceid:ServiceId-exxxxxx6-7xxx-xxxc-b000-6xxxxxe90005',
-    'IBM_COS_API_KEY_ID': 'xxCXXXXii0007-004-jYAxxxxxFwzHSxxxxFZxxxxUt4',
-    'RESULTS_BUCKET': 'billing-data'
 }
 #
 # Get current date and time
@@ -113,13 +122,13 @@ Billing_path = './'+ Billing_file
 
 USER_ID = credentials['IBM_CLOUD_ACCOUNT_ID']
 API_KEY = credentials['IBM_CLOUD_ACCOUNT_API_KEY']
-IBM_CLOUD_BILLING_ENDPOINT = credentials['IBM_CLOUD_BILLING_ENDPOINT']
-IBM_CLOUD_REPORTING_PREFIX = credentials['IBM_CLOUD_REPORTING_PREFIX']
+IBM_CLOUD_BILLING_ENDPOINT = endpoints['IBM_CLOUD_BILLING_ENDPOINT']
+IBM_CLOUD_REPORTING_PREFIX = endpoints['IBM_CLOUD_REPORTING_PREFIX']
 
 
 # # Setup Cloud Object Storage (COS)
 
-# In[4]:
+# In[ ]:
 
 
 #
@@ -131,16 +140,16 @@ from ibm_botocore.client import Config
 cos = ibm_boto3.client(service_name='s3',
     ibm_api_key_id=credentials['IBM_COS_API_KEY_ID'],
     ibm_service_instance_id=credentials['IAM_COS_SERVICE_ID'],
-    ibm_auth_endpoint=credentials['IBM_AUTH_ENDPOINT'],
+    ibm_auth_endpoint=endpoints['IBM_AUTH_ENDPOINT'],
     config=Config(signature_version='oauth'),
-    endpoint_url=credentials['COS_ENDPOINT'])
+    endpoint_url=endpoints['COS_ENDPOINT'])
 
 
 # # IBM Cloud Usage API methods
 # Define some useful methods to grab data using the IBM Cloud Usage REST API (https://cloud.ibm.com/apidocs/metering-reporting).
 #
 
-# In[5]:
+# In[ ]:
 
 
 #
@@ -159,7 +168,7 @@ def getBearerToken(accountID,APIKey):
         }
     data = {}
     #
-    target_url = credentials['IBM_CLOUD_IAM_ENDPOINT'] + '/identity/token'
+    target_url = endpoints['IBM_CLOUD_IAM_ENDPOINT'] + '/identity/token'
     #
     # Set up your parameters (in a PARAMS dict)
     #
@@ -313,7 +322,7 @@ def getAccountResourceList(accountID,token):
     return_token = ""
     data = {}
     #
-    target_url = credentials['IBM_CLOUD_RESCONT_ENDPOINT'] + "/resource_instances"
+    target_url = endpoints['IBM_CLOUD_RESCONT_ENDPOINT'] + "/resource_instances"
 
     #
     # Set up your parameters (in a PARAMS dict)
@@ -365,7 +374,7 @@ def parseAccountResourceList(accountID,token):
     return_token = ""
     data = {}
     #
-    target_url = credentials['IBM_CLOUD_RESCONT_ENDPOINT'] + "/resource_instances"
+    target_url = endpoints['IBM_CLOUD_RESCONT_ENDPOINT'] + "/resource_instances"
 
     #
     # Set up your parameters (in a PARAMS dict)
@@ -417,7 +426,7 @@ def getAccountResourceGroupList(accountID,token):
     return_token = ""
     data = {}
     #
-    target_url = credentials['IBM_CLOUD_RESCONT_ENDPOINT'] + "/resource_groups?account_id=" + accountID
+    target_url = endpoints['IBM_CLOUD_RESCONT_ENDPOINT'] + "/resource_groups?account_id=" + accountID
 
     #
     # Set up your parameters (in a PARAMS dict)
@@ -469,7 +478,7 @@ def getAccountResourceGroupList(accountID,token):
 #
 #
 
-# In[6]:
+# In[ ]:
 
 
 #
@@ -693,7 +702,7 @@ def getMonthlyUsageList(accountID,apikey,billYear,billMonth):
     return result_array
 
 
-# In[7]:
+# In[ ]:
 
 
 def printResults(resultArray):
@@ -729,7 +738,7 @@ def printResults(resultArray):
     return True
 
 
-# In[8]:
+# In[ ]:
 
 
 def dumpToCSV(resultArray,csvfilename):
@@ -771,7 +780,7 @@ def dumpToCSV(resultArray,csvfilename):
     return True
 
 
-# In[9]:
+# In[ ]:
 
 
 #
